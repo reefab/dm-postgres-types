@@ -13,6 +13,7 @@ require 'dm-postgres-types/property/pg_array'
 require 'dm-postgres-types/property/pg_numeric_array'
 require 'dm-postgres-types/property/pg_hstore'
 require 'dm-postgres-types/property/pg_json'
+require 'dm-postgres-types/property/pg_time'
 require 'dm-postgres-types/version'
 
 # migrations and primitives
@@ -30,6 +31,8 @@ module DataMapper
           schema[:length] = nil
         elsif property.kind_of?(Property::PgJSON)
           schema.delete(:length)
+        elsif property.kind_of?(Property::PgTime)
+          schema[:primitive] = "#{schema[:primitive]} (0) without time zone"
         end
 
         schema
@@ -48,7 +51,8 @@ module DataMapper
           Property::PgHStore => { primitive: 'HSTORE' },
           Property::PgNumericArray => { primitive: "NUMERIC" },
           Property::PgArray => { primitive: "TEXT" },
-          Property::PgJSON => { primitive: 'JSON' }
+          Property::PgJSON => { primitive: 'JSON' },
+          Property::PgTime => { primitive: 'TIME' }
         }
         super.merge(postgres_types).freeze
       end
